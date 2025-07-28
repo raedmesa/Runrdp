@@ -1,0 +1,19 @@
+name: Windows RDP via Ngrok
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Download ngrok and start RDP tunnel
+      run: |
+        Invoke-WebRequest -Uri https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+        Expand-Archive .\ngrok.zip -DestinationPath $env:USERPROFILE\ngrok
+        cd $env:USERPROFILE\ngrok
+        .\ngrok.exe authtoken 30VJ0Myc22G6MwzSLG8mrmcfHJ2_6QtyHGsxuvCez58BnNsRJ
+        Start-Process -NoNewWindow -FilePath .\ngrok.exe -ArgumentList "tcp 3389"
+        Start-Sleep -Seconds 20
+        Write-Output "🔗 Wait a few seconds... then scroll up to find the ngrok RDP link in the logs."
+        Get-Content "$env:USERPROFILE\ngrok\logs\ngrok.log" -Wait
